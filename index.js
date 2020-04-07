@@ -9,7 +9,27 @@ const address = '';
 const privateKey = '';
 
 let logins = {};
+const ips = [];
 
+async function getIPaddresses() {
+  try {
+    const ip = '62.171.163.150';
+    const detZelNodes = await axios.get(`http://${ip}:16127/zelcash/viewdeterministiczelnodelist`);
+    if (detZelNodes.data.status === 'success') {
+      const data = detZelNodes.data.data;
+      data.forEach((zelnode) => {
+        if (zelnode.ip != '') {
+          ips.push(zelnode.ip);
+        }
+      });
+      return true;
+    } else {
+      throw detZelNodes.data.data;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
 // return signature of a given message providing a private key
 async function signMessage(message, privKey) {
   if (privKey.length !== 64) {
@@ -230,29 +250,35 @@ async function login(ip) {
     };
     const verifyLogin = await axios.post(`http://${ip}:16127/zelid/verifylogin`, qs.stringify(zelidauth));
     if (verifyLogin.data.status === 'success') {
-      console.log(`Login to ${ip} success. Storing login data`);
+      console.log(`Login to ${ip} success.`);
       const login = qs.stringify(zelidauth);
       logins[ip] = login;
-      saveLogins(logins);
+      console.log(login);
       return true;
     } else {
-      throw verifyLogin.data.data;
+      return false;
     }
   } catch (error) {
     console.log(error);
+    return false;
   }
 }
 
 async function massLogin() {
-  loadLogins();
-  setTimeout(() => {
-    console.log(logins);
-    updateZelFlux('62.171.163.150');
-  }, 2000);
-  // const loggedIn = await login('62.171.163.150');
-  // console.log(loggedIn)
-  // if true, you shall wait one second, then login another one
+  const ipsObtained = await getIPaddresses();
+  let i = 1;
+  if (ipsObtained) {
+    setTimeout(async () => {
+      for (const ip of ips) {
+        const loggedIn = await login(ip);
+        console.log(i + ' ' + ip + ': ' + loggedIn);
+        i++;
+      }
+      setTimeout(() => {
+        saveLogins(logins);
+      }, 1000);
+    }, 2000);
+  }
 }
 
-massLogin();
-
+// massLogin();
