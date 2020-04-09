@@ -132,6 +132,29 @@ async function getZelBenchVersion(ip) {
 }
 
 // returns number of scannedheight
+async function isAllOnNodeOK(ip) {
+  try {
+    const zelbenchStatus = await axios.get(`http://${ip}:16127/zelbench/getstatus`);
+    if (zelbenchStatus.data.status === 'success') {
+      if (zelbenchStatus.data.data.status === 'online' && zelbenchStatus.data.data.zelback === 'connected') {
+        if (zelbenchStatus.data.data.benchmarking === 'toaster' || zelbenchStatus.data.data.benchmarking === 'failed') {
+          return 'BAD';
+        } else {
+          return 'OK';
+        }
+      } else {
+        return 'BAD';
+      }
+    } else {
+      return 'BAD';
+    }
+  } catch (error) {
+    return 'BAD';
+  }
+}
+
+
+// returns number of scannedheight
 async function getScannedHeight(ip) {
   try {
     const loginPhraseResponse = await axios.get(`http://${ip}:16127/explorer/scannedheight`);
@@ -266,6 +289,20 @@ async function updateZelBench(ip) {
   }
 }
 
+async function updateZelBenchFast(ip) {
+  try {
+    authHeader = await getAuthHeader(ip);
+    const zelidauthHeader = authHeader;
+    axios.get(`http://${ip}:16127/zelnode/updatezelbench`, {
+      headers: {
+        zelidauth: zelidauthHeader,
+      },
+    });
+  } catch (error) {
+    return 'OK2';
+  }
+}
+
 async function updateZelCash(ip) {
   try {
     authHeader = await getAuthHeader(ip);
@@ -379,7 +416,7 @@ async function massAskFluxVersion() {
       const fluxVersion = await getFluxVersion(ip);
       console.log(i + ' ' + ip + ': ' + fluxVersion);
       i++;
-      if (fluxVersion < 56) {
+      if (fluxVersion < 57) {
         j++
       }
       console.log("Nodes to update: " + j)
@@ -410,19 +447,14 @@ async function massHardFluxUpdate() {
   loadLogins();
   let i = 1;
   setTimeout(async () => {
-    const ips = [
-      '77.55.218.98',
-      '77.55.236.113',
-      '144.91.79.167',
-      '167.86.71.144'
-    ]
+    const ips = [ '167.86.71.144', '49.12.8.215', '47.22.47.169' ]
     const totalNodes = ips.length;
     console.log(totalNodes);
     for (const ip of ips) {
       const fluxVersion = await getFluxVersion(ip);
       console.log('Flux version on ' + i + ' ' + ip + ': v' + fluxVersion);
       i++;
-      if (fluxVersion < 56) {
+      if (fluxVersion < 57) {
         const updateResponse = await updateZelFluxTheHardWay(ip);
         console.log('Updating Flux on ' + ip + ': ' + updateResponse);
       }
@@ -465,13 +497,13 @@ async function massZelBenchUpdate() {
       const fluxVersion = await getFluxVersion(ip);
       // console.log('Flux version on ' + i + ' ' + ip + ': v' + fluxVersion);
       i++;
-      if (fluxVersion == 56) {
+      if (fluxVersion == 57) {
         const zelbenchVersion = await getZelBenchVersion(ip);
         if (zelbenchVersion < 110) {
           console.log('Updating ' + ip);
           const updateZB = await updateZelBench(ip);
           if (updateZB === 'OK' || updateZB == 'OK2') {
-            await timeout(210000);
+            await timeout(180000);
             const zelbenchVersion2 = await getZelBenchVersion(ip);
             console.log(zelbenchVersion2);
             if (zelbenchVersion2 === 'BAD') {
@@ -479,25 +511,33 @@ async function massZelBenchUpdate() {
               console.log('Something went wrong on ' + ip + ' Restarting daemon.')
               const restartZelcash = await restartDaemon(ip);
               if (restartZelcash == 'OK' || restartZelcash == 'OK2') {
-                await timeout(210000);
+                await timeout(180000);
                 const zelbenchVersion3 = await getZelBenchVersion(ip);
                 if (zelbenchVersion3 >= 110) {
                   console.log('Update on ' + ip + ' was succesful. Restarting benchmarks.')
-                  await timeout(210000);
-                  await restartNodeBenchmarks();
+                  await timeout(180000);
+                  await restartNodeBenchmarks(ip);
                 } else {
                   console.log('Failed to update ip ' + ip);
                 }
               } else {
                 console.log('Critical error on ' + ip);
               }
-            } else if (zelbenchVersion3 >= 110) {
-              console.log('Update on ' + ip + ' was succesful. Restarting benchmarks.')
-              await timeout(120000);
-              await restartNodeBenchmarks();
+            } else if (zelbenchVersion2 >= 110) {
+              console.log('Update on ' + ip + ' was succesful.');
+              const isOK = await isAllOnNodeOK(ip);
+              if (isOK == 'BAD') {
+                console.log('Update on ' + ip + ' RERUNNING BENCHMARKING NOTED.');
+                await timeout(120000);
+                await restartNodeBenchmarks(ip);
+              } else {
+                console.log('Update on ' + ip + ' BENCH test OK.');
+              }
             } else {
               console.log('Failed to update node ' + ip);
             }
+          } else {
+            console.log('Bad stuff happened while running updateZelBench' + ip);
           }
         }
       }
@@ -505,11 +545,71 @@ async function massZelBenchUpdate() {
   }, 2000);
 }
 
-// massZelBenchUpdate();
-massFluxUpdate();
+async function massZelBenchUpdate2() {
+  loadLogins();
+  let i = 1;
+  setTimeout(async () => {
+    const ipsAll = Object.keys(logins)
+    const totalNodes = ipsAll.length;
+    const ips = ipsAll;
+    console.log(totalNodes);
+    for (const ip of ips) {
+      const fluxVersion = await getFluxVersion(ip);
+      // console.log('Flux version on ' + i + ' ' + ip + ': v' + fluxVersion);
+      i++;
+      if (fluxVersion == 57) {
+        const zelbenchVersion = await getZelBenchVersion(ip);
+        console.log(i);
+        if (zelbenchVersion < 110) {
+          console.log('Updating ' + ip);
+          updateZelBenchFast(ip);
+        }
+      }
+    }
+  }, 2000);
+}
+
+async function massZelBenchCheck() {
+  loadLogins();
+  let i = 0;
+  setTimeout(async () => {
+    const ipsAll = Object.keys(logins)
+    const totalNodes = ipsAll.length;
+    const ips = ipsAll;
+    console.log(totalNodes);
+    for (const ip of ips) {
+      const fluxVersion = await getFluxVersion(ip);
+      // console.log('Flux version on ' + i + ' ' + ip + ': v' + fluxVersion);
+      i++;
+      if (fluxVersion == 57) {
+        const zelbenchVersion = await getZelBenchVersion(ip);
+        if (zelbenchVersion >= 110) {
+          const isOK = await isAllOnNodeOK(ip);
+          if (isOK == 'BAD') {
+            console.log(i + ' Update on ' + ip + ' RERUNNING BENCHMARKING.');
+            //await restartNodeBenchmarks(ip);
+          } else {
+            console.log(i + ' Update on ' + ip + ' BENCH test OK.');
+          }
+        } else if (zelbenchVersion < 110){
+          console.log(i + ' Update on ' + ip + ' FAILED');
+        } else {
+          console.log(i + ' Update on ' + ip + ' ERROR');
+          // errored, restart daemon
+          // restartDaemon(ip);
+        }
+      }
+    }
+  }, 2000);
+}
+
+
+// massFluxUpdate();
+// massZelBenchCheck();
+// massHardFluxUpdate();
 // loadLogins();
-// // getBadFLuxVersions();
+// getBadFLuxVersions();
 // setTimeout(() => {
 //   // updateZelFlux('62.3.98.164');
-//   restartDaemon('62.3.98.164');
+//   massLogin();
 // }, 2000)
