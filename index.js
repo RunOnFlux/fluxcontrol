@@ -39,8 +39,8 @@ async function signMessage(message, privKey) {
   if (privKey.length !== 64) {
     privKey = zeltrezjs.address.WIFToPrivKey(privKey);
   }
-  const privateKey = Buffer.from(privKey, "hex");
-  const mysignature = btcmessage.sign(message, privateKey, true);
+  const pk = Buffer.from(privKey, "hex");
+  const mysignature = btcmessage.sign(message, pk, true);
   return mysignature.toString("base64");
 }
 
@@ -106,11 +106,40 @@ async function getLoginPhrase(ip) {
 // returns number of minor flux version
 async function getFluxVersion(ip) {
   try {
-    const loginPhraseResponse = await axios.get(`http://${ip}:16127/zelflux/version`);
+    const axiosConfig = {
+      timeout: 3456,
+    };
+    const loginPhraseResponse = await axios.get(`http://${ip}:16127/zelflux/version`, axiosConfig);
     if (loginPhraseResponse.data.status === 'success') {
       return Number(loginPhraseResponse.data.data.split('.')[1]);
     } else {
       throw loginPhraseResponse.data.data;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function getFluxScannedHeight(ip) {
+  try {
+    const scannedHeightResponse = await axios.get(`http://${ip}:16127/explorer/scannedheight`);
+    if (scannedHeightResponse.data.status === 'success') {
+      return Number(scannedHeightResponse.data.data.generalScannedHeight);
+    } else {
+      throw scannedHeightResponse.data.data;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function getBalance(ip, address) {
+  try {
+    const balanceResponse = await axios.get(`http://${ip}:16127/explorer/balance/${address}`);
+    if (balanceResponse.data.status === 'success') {
+      return Number(balanceResponse.data.data);
+    } else {
+      throw balanceResponse.data.data;
     }
   } catch (error) {
     console.log(error);
@@ -342,6 +371,26 @@ async function updateZelFlux(ip) {
   }
 }
 
+async function getZelFluxErrorLog(ip) {
+  try {
+    authHeader = await getAuthHeader(ip);
+    const zelidauthHeader = authHeader;
+    const updateResponse = await axios.get(`http://${ip}:16127/zelnode/zelfluxerrorlog`, {
+      headers: {
+        zelidauth: zelidauthHeader,
+      },
+    });
+    console.log(updateResponse);
+    if (updateResponse.data.status === 'success') {
+      return 'OK';
+    } else {
+      throw updateResponse.data.data;
+    }
+  } catch (error) {
+    return 'OK2';
+  }
+}
+
 async function updateZelFluxTheHardWay(ip) {
   try {
     authHeader = await getAuthHeader(ip);
@@ -351,6 +400,7 @@ async function updateZelFluxTheHardWay(ip) {
         zelidauth: zelidauthHeader,
       },
     });
+    console.log(updateResponse);
     if (updateResponse.data.status === 'success') {
       return 'OK';
     } else {
@@ -393,8 +443,12 @@ async function massLogin() {
   if (ipsObtained.length > 0) {
     setTimeout(async () => {
       for (const ip of ipsObtained) {
-        const loggedIn = await login(ip);
-        console.log(i + ' ' + ip + ': ' + loggedIn);
+        if (!logins[ip]) {
+          const loggedIn = await login(ip);
+          console.log(i + ' ' + ip + ': ' + loggedIn);
+        } else {
+          console.log(i + ' ' + ip + ': already logged in.');
+        }
         i++;
       }
       setTimeout(() => {
@@ -416,7 +470,7 @@ async function massAskFluxVersion() {
       const fluxVersion = await getFluxVersion(ip);
       console.log(i + ' ' + ip + ': ' + fluxVersion);
       i++;
-      if (fluxVersion < 57) {
+      if (fluxVersion < 58) {
         j++
       }
       console.log("Nodes to update: " + j)
@@ -435,7 +489,7 @@ async function massFluxUpdate() {
       const fluxVersion = await getFluxVersion(ip);
       console.log('Flux version on ' + i + ' ' + ip + ': v' + fluxVersion);
       i++;
-      if (fluxVersion < 57) {
+      if (fluxVersion < 58) {
         const updateResponse = await updateZelFlux(ip);
         console.log('Updating Flux on ' + ip + ': ' + updateResponse);
       }
@@ -447,14 +501,18 @@ async function massHardFluxUpdate() {
   loadLogins();
   let i = 1;
   setTimeout(async () => {
-    const ips = [ '167.86.71.144', '49.12.8.215', '47.22.47.169' ]
+    const ips = [
+      '193.188.15.241',
+      '167.86.71.144',
+      '5.189.182.226',
+    ]
     const totalNodes = ips.length;
     console.log(totalNodes);
     for (const ip of ips) {
       const fluxVersion = await getFluxVersion(ip);
       console.log('Flux version on ' + i + ' ' + ip + ': v' + fluxVersion);
       i++;
-      if (fluxVersion < 57) {
+      if (fluxVersion < 58) {
         const updateResponse = await updateZelFluxTheHardWay(ip);
         console.log('Updating Flux on ' + ip + ': ' + updateResponse);
       }
@@ -465,14 +523,18 @@ async function massHardFluxUpdate() {
 async function getBadFLuxVersions() {
   const ipsObtained = await getIPaddresses();
   let badFluxes = [];
+  let unreachableFluxes = [];
   let i = 1;
   if (ipsObtained.length > 0) {
     setTimeout(async () => {
       for (const ip of ipsObtained) {
         const fluxVersion = await getFluxVersion(ip);
-        if (fluxVersion < 57) {
+        if (fluxVersion < 58) {
           badFluxes.push(ip);
           console.log(ip + ' IS A NOT CORRECT');
+        } else if (!fluxVersion) {
+          unreachableFluxes.push(ip);
+          console.log(ip + ' IS ureachable');
         } else {
           console.log(i + ' ' + ip + ' v' + fluxVersion);
         }
@@ -480,6 +542,7 @@ async function getBadFLuxVersions() {
       }
       setTimeout(() => {
         console.log(badFluxes);
+        console.log(unreachableFluxes);
       }, 1000);
     }, 2000);
   }
@@ -497,7 +560,7 @@ async function massZelBenchUpdate() {
       const fluxVersion = await getFluxVersion(ip);
       // console.log('Flux version on ' + i + ' ' + ip + ': v' + fluxVersion);
       i++;
-      if (fluxVersion == 57) {
+      if (fluxVersion >= 57) {
         const zelbenchVersion = await getZelBenchVersion(ip);
         if (zelbenchVersion < 110) {
           console.log('Updating ' + ip);
@@ -549,7 +612,7 @@ async function massZelBenchUpdate2() {
   loadLogins();
   let i = 1;
   setTimeout(async () => {
-    const ipsAll = Object.keys(logins)
+    const ipsAll = ['173.249.42.126', '95.217.0.148', '95.216.200.95', '86.252.37.74', '77.37.224.231'];//Object.keys(logins)
     const totalNodes = ipsAll.length;
     const ips = ipsAll;
     console.log(totalNodes);
@@ -557,7 +620,7 @@ async function massZelBenchUpdate2() {
       const fluxVersion = await getFluxVersion(ip);
       // console.log('Flux version on ' + i + ' ' + ip + ': v' + fluxVersion);
       i++;
-      if (fluxVersion == 57) {
+      if (fluxVersion >= 57) {
         const zelbenchVersion = await getZelBenchVersion(ip);
         console.log(i);
         if (zelbenchVersion < 110) {
@@ -581,7 +644,7 @@ async function massZelBenchCheck() {
       const fluxVersion = await getFluxVersion(ip);
       // console.log('Flux version on ' + i + ' ' + ip + ': v' + fluxVersion);
       i++;
-      if (fluxVersion == 57) {
+      if (fluxVersion >= 57) {
         const zelbenchVersion = await getZelBenchVersion(ip);
         if (zelbenchVersion >= 110) {
           const isOK = await isAllOnNodeOK(ip);
@@ -591,7 +654,7 @@ async function massZelBenchCheck() {
           } else {
             console.log(i + ' Update on ' + ip + ' BENCH test OK.');
           }
-        } else if (zelbenchVersion < 110){
+        } else if (zelbenchVersion < 110) {
           console.log(i + ' Update on ' + ip + ' FAILED');
         } else {
           console.log(i + ' Update on ' + ip + ' ERROR');
@@ -603,13 +666,130 @@ async function massZelBenchCheck() {
   }, 2000);
 }
 
+async function getBadFluxScannedHeights() {
+  const ipsObtained = await getIPaddresses();
+  let badFluxes = [];
+  let badFluxBalance = [];
+  let i = 1;
+  if (ipsObtained.length > 0) {
+    setTimeout(async () => {
+      for (const ip of ipsObtained) {
+        const height = await getFluxScannedHeight(ip);
+        if (height < 576113) {
+          badFluxes.push(ip);
+          console.log(ip + ' IS A NOT SYNCED');
+        } else {
+          console.log(i + ' ' + ip + ' ' + height);
+          const balance = await getBalance(ip, 't1TRUNKQMx1DVzym4d2Ay5E1dudEcHiyk9C');
+          if (balance !== 10024750000000) {
+            badFluxBalance.push(ip);
+            console.log(i + ' ' + ip + ' balance is bad ' + balance);
+          }
+        }
+        i++;
+      }
+      setTimeout(() => {
+        console.log(badFluxes);
+        console.log(badFluxBalance);
+      }, 1000);
+    }, 2000);
+  }
+}
 
-// massFluxUpdate();
+async function getBalance(ip) {
+  try {
+    authHeader = await getAuthHeader(ip);
+    const zelidauthHeader = authHeader;
+    const updateResponse = await axios.get(`http://${ip}:16127/zelcash/getbalance`, {
+      headers: {
+        zelidauth: zelidauthHeader,
+      },
+      timeout: 3456,
+    });
+    if (updateResponse.data.status === 'success') {
+      return true
+    } else {
+      throw false
+    }
+  } catch (error) {
+    return false
+  }
+}
+
+async function amIAdmin() {
+  loadLogins();
+  let i = 1;
+  const admins = [];
+  setTimeout(async () => {
+    const ips = Object.keys(logins)
+    const totalNodes = ips.length;
+    console.log(totalNodes);
+    for (const ip of ips) {
+      const admin = await getBalance(ip);
+      if (admin) {
+        console.log('admin on ' + ip);
+        admins.push(ip)
+      } else {
+        console.log(i + ' ' + ip);
+      }
+      i++;
+    }
+    setTimeout(() => {
+      console.log(admins);
+    }, 1000);
+  }, 2000);
+}
+
+async function startFolding(ip) {
+  try {
+    authHeader = await getAuthHeader(ip);
+    const zelidauthHeader = authHeader;
+    await axios.get(`http://${ip}:16127/zelapps/zelapptemporarylocalregister/foldingathome`, {
+      headers: {
+        zelidauth: zelidauthHeader,
+      },
+      timeout: 3456,
+    });
+    return true;
+  } catch (error) {
+    return false
+  }
+}
+
+async function massStartFolding() {
+  loadLogins();
+  let i = 1;
+  const admins = [];
+  setTimeout(async () => {
+    const ips = [
+    ];
+    const totalNodes = ips.length;
+    console.log(totalNodes);
+    for (const ip of ips) {
+      const folding = await startFolding(ip);
+      if (folding) {
+        console.log("hurray")
+      } else {
+        console.log(ip);
+      }
+      i++;
+    }
+    setTimeout(() => {
+      console.log(admins);
+    }, 1000);
+  }, 2000);
+}
+
+// massStartFolding();
+massFluxUpdate();
 // massZelBenchCheck();
 // massHardFluxUpdate();
 // loadLogins();
 // getBadFLuxVersions();
 // setTimeout(() => {
-//   // updateZelFlux('62.3.98.164');
-//   massLogin();
+  // massZelBenchUpdate2('77.37.224.231');
+  // updateZelFluxTheHardWay('167.86.116.11');
+  // massLogin();
 // }, 2000)
+
+// getBadFluxScannedHeights();
