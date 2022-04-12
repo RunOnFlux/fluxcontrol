@@ -126,7 +126,9 @@ async function getAuthHeader(ip) {
 // returns login phrase of zelnode
 async function getLoginPhrase(ip) {
   try {
-    const loginPhraseResponse = await axiosGet(`http://${ip}:16127/id/loginphrase`);
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const loginPhraseResponse = await axiosGet(`http://${adjIp}:${adjPort}/id/loginphrase`);
     if (loginPhraseResponse.data.status === 'success') {
       return loginPhraseResponse.data.data;
     } else {
@@ -139,7 +141,9 @@ async function getLoginPhrase(ip) {
 
 async function getMessage(ip, message) {
   try {
-    const loginPhraseResponse = await axiosGet(`http://${ip}:16127/apps/hashes`);
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const loginPhraseResponse = await axiosGet(`http://${adjIp}:${adjPort}/apps/hashes`);
     if (loginPhraseResponse.data.status === 'success') {
       const messFound = loginPhraseResponse.data.data.find((a) => a.hash === message && a.message === true);
       if (messFound) {
@@ -160,7 +164,7 @@ async function getFluxVersion(ip) {
     const axiosConfig = {
       timeout: 6666,
     };
-    const loginPhraseResponse = await axiosGet(`http://${ip}:16127/flux/version`, axiosConfig);
+    const loginPhraseResponse = await axiosGet(`http://${adjIp}:${adjPort}/flux/version`, axiosConfig);
     if (loginPhraseResponse.data.status === 'success') {
       return loginPhraseResponse.data.data;
       return Number(loginPhraseResponse.data.data.split('.')[2]);
@@ -177,7 +181,7 @@ async function getApplications(ip) {
     const axiosConfig = {
       timeout: 4567,
     };
-    const loginPhraseResponse = await axiosGet(`http://${ip}:16127/apps/globalappsspecifications`, axiosConfig);
+    const loginPhraseResponse = await axiosGet(`http://${adjIp}:${adjPort}/apps/globalappsspecifications`, axiosConfig);
     if (loginPhraseResponse.data.status === 'success') {
       return loginPhraseResponse.data.data;
     } else {
@@ -190,7 +194,7 @@ async function getApplications(ip) {
 
 async function getFluxScannedHeight(ip) {
   try {
-    const scannedHeightResponse = await axiosGet(`http://${ip}:16127/explorer/scannedheight`);
+    const scannedHeightResponse = await axiosGet(`http://${adjIp}:${adjPort}/explorer/scannedheight`);
     if (scannedHeightResponse.data.status === 'success') {
       return Number(scannedHeightResponse.data.data.generalScannedHeight);
     } else {
@@ -203,7 +207,9 @@ async function getFluxScannedHeight(ip) {
 
 async function getBalance(ip, address) {
   try {
-    const balanceResponse = await axiosGet(`http://${ip}:16127/explorer/balance/${address}`);
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const balanceResponse = await axiosGet(`http://${adjIp}:${adjPort}/explorer/balance/${address}`);
     if (balanceResponse.data.status === 'success') {
       return Number(balanceResponse.data.data);
     } else {
@@ -217,7 +223,9 @@ async function getBalance(ip, address) {
 // returns number of scannedheight
 async function getZelBenchVersion(ip) {
   try {
-    const loginPhraseResponse = await axiosGet(`http://${ip}:16127/benchmark/getinfo`);
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const loginPhraseResponse = await axiosGet(`http://${adjIp}:${adjPort}/benchmark/getinfo`);
     if (loginPhraseResponse.data.status === 'success') {
       return Number(loginPhraseResponse.data.data.version.split('.').join(''));
     } else {
@@ -231,7 +239,9 @@ async function getZelBenchVersion(ip) {
 // returns number of scannedheight
 async function getZelCashVersion(ip) {
   try {
-    const loginPhraseResponse = await axiosGet(`http://${ip}:16127/daemon/getinfo`);
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const loginPhraseResponse = await axiosGet(`http://${adjIp}:${adjPort}/daemon/getinfo`);
     if (loginPhraseResponse.data.status === 'success') {
       return Number(loginPhraseResponse.data.data.version);
     } else {
@@ -244,7 +254,9 @@ async function getZelCashVersion(ip) {
 
 async function getZelCashError(ip) {
   try {
-    const getInfoResp = await axiosGet(`http://${ip}:16127/daemon/getinfo`);
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const getInfoResp = await axiosGet(`http://${adjIp}:${adjPort}/daemon/getinfo`);
     // console.log(getInfoResp.data.data.errors);
     if (getInfoResp.data.status === 'success') {
       if (getInfoResp.data.data.errors.includes('EXCEPTION')) {
@@ -263,7 +275,9 @@ async function getZelCashError(ip) {
 // returns number of scannedheight
 async function isAllOnNodeOK(ip) {
   try {
-    const zelbenchStatus = await axiosGet(`http://${ip}:16127/benchmark/getstatus`);
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const zelbenchStatus = await axiosGet(`http://${adjIp}:${adjPort}/benchmark/getstatus`);
     if (zelbenchStatus.data.status === 'success') {
       if (zelbenchStatus.data.data.status === 'online' && zelbenchStatus.data.data.zelback === 'connected') {
         if (zelbenchStatus.data.data.benchmarking === 'toaster' || zelbenchStatus.data.data.benchmarking === 'failed') {
@@ -286,7 +300,9 @@ async function isAllOnNodeOK(ip) {
 // returns number of scannedheight
 async function getScannedHeight(ip) {
   try {
-    const loginPhraseResponse = await axiosGet(`http://${ip}:16127/explorer/scannedheight`);
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const loginPhraseResponse = await axiosGet(`http://${adjIp}:${adjPort}/explorer/scannedheight`);
     if (loginPhraseResponse.data.status === 'success') {
       return loginPhraseResponse.data.data.generalScannedHeight;
     } else {
@@ -299,11 +315,13 @@ async function getScannedHeight(ip) {
 
 async function zelcashPing(ip) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     console.log(authHeader);
     const zelidauthHeader = authHeader;
     console.log(zelidauthHeader);
-    const restartResponse = await axiosGet(`http://${ip}:16127/daemon/ping`, {
+    const restartResponse = await axiosGet(`http://${adjIp}:${adjPort}/daemon/ping`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -321,9 +339,11 @@ async function zelcashPing(ip) {
 
 async function restartNodeBenchmarks(ip) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const restartResponse = await axiosGet(`http://${ip}:16127/benchmark/restartnodebenchmarks`, {
+    const restartResponse = await axiosGet(`http://${adjIp}:${adjPort}/benchmark/restartnodebenchmarks`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -341,10 +361,12 @@ async function restartNodeBenchmarks(ip) {
 
 async function broadcastMessage(ip, message) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
     console.log(authHeader);
-    const response = await axios.post(`http://${ip}:16127/flux/broadcastmessage`, JSON.stringify(message), {
+    const response = await axios.post(`http://${adjIp}:${adjPort}/flux/broadcastmessage`, JSON.stringify(message), {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -358,9 +380,11 @@ async function broadcastMessage(ip, message) {
 
 async function restartDaemon(ip) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const restartResponse = await axiosGet(`http://${ip}:16127/daemon/restart`, {
+    const restartResponse = await axiosGet(`http://${adjIp}:${adjPort}/daemon/restart`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -380,9 +404,11 @@ async function restartDaemon(ip) {
 
 async function restartExplorerSync(ip) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const restartResponse = await axiosGet(`http://${ip}:16127/explorer/restart`, {
+    const restartResponse = await axiosGet(`http://${adjIp}:${adjPort}/explorer/restart`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -401,9 +427,11 @@ async function restartExplorerSync(ip) {
 
 async function stopExplorerSync(ip) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const restartResponse = await axiosGet(`http://${ip}:16127/explorer/stop`, {
+    const restartResponse = await axiosGet(`http://${adjIp}:${adjPort}/explorer/stop`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -422,9 +450,11 @@ async function stopExplorerSync(ip) {
 
 async function updateZelBench(ip) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const updateResponse = await axiosGet(`http://${ip}:16127/flux/updatebenchmark`, {
+    const updateResponse = await axiosGet(`http://${adjIp}:${adjPort}/flux/updatebenchmark`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -443,9 +473,11 @@ async function updateZelBench(ip) {
 
 async function updateZelBenchFast(ip) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    axiosGet(`http://${ip}:16127/flux/updatebenchmark`, {
+    axiosGet(`http://${adjIp}:${adjPort}/flux/updatebenchmark`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -458,9 +490,11 @@ async function updateZelBenchFast(ip) {
 
 async function updateZelCash(ip) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const updateResponse = await axiosGet(`http://${ip}:16127/flux/updatedaemon`, {
+    const updateResponse = await axiosGet(`http://${adjIp}:${adjPort}/flux/updatedaemon`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -479,9 +513,11 @@ async function updateZelCash(ip) {
 
 async function restartApp(ip, appname) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const updateResponse = await axiosGet(`http://${ip}:16127/apps/apprestart/${appname}`, {
+    const updateResponse = await axiosGet(`http://${adjIp}:${adjPort}/apps/apprestart/${appname}`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -495,9 +531,11 @@ async function restartApp(ip, appname) {
 
 async function updateZelCashFast(ip) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    axiosGet(`http://${ip}:16127/flux/updatedaemon`, {
+    axiosGet(`http://${adjIp}:${adjPort}/flux/updatedaemon`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -510,9 +548,11 @@ async function updateZelCashFast(ip) {
 
 async function updateZelFlux(ip) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const updateResponse = await axiosGet(`http://${ip}:16127/flux/softupdateflux`, {
+    const updateResponse = await axiosGet(`http://${adjIp}:${adjPort}/flux/softupdateflux`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -532,9 +572,11 @@ async function updateZelFlux(ip) {
 const abc = [];
 async function rescanApps(ip) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const updateResponse = await axiosGet(`http://${ip}:16127/apps/rescanglobalappsinformation/10/false`, {
+    const updateResponse = await axiosGet(`http://${adjIp}:${adjPort}/apps/rescanglobalappsinformation/10/false`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -555,9 +597,11 @@ async function rescanApps(ip) {
 
 async function getZelFluxErrorLog(ip) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const updateResponse = await axiosGet(`http://${ip}:16127/flux/errorlog`, {
+    const updateResponse = await axiosGet(`http://${adjIp}:${adjPort}/flux/errorlog`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -576,9 +620,11 @@ async function getZelFluxErrorLog(ip) {
 
 async function updateZelFluxTheHardWay(ip) {
   try {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const updateResponse = await axiosGet(`http://${ip}:16127/flux/hardupdateflux`, {
+    const updateResponse = await axiosGet(`http://${adjIp}:${adjPort}/flux/hardupdateflux`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -607,7 +653,9 @@ async function login(ip) {
       signature,
       loginPhrase,
     };
-    const verifyLogin = await axiosPost(`http://${ip}:16127/id/verifylogin`, qs.stringify(zelidauth));
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const verifyLogin = await axiosPost(`http://${adjIp}:${adjPort}/id/verifylogin`, qs.stringify(zelidauth));
     if (verifyLogin.data.status === 'success') {
       console.log(`Login to ${ip} success.`);
       const login = qs.stringify(zelidauth);
@@ -680,7 +728,7 @@ async function massFluxUpdate() {
     //const ips = await getKadenaLocations();
     // const ips = ["144.91.64.97","95.111.224.33","89.58.30.78","144.91.76.45","178.18.248.135","95.111.255.151","185.239.209.230","193.188.15.214","193.188.15.215","95.217.213.69","62.171.184.53","194.163.162.211","62.171.159.189","161.97.165.7","173.249.50.4","157.90.221.137","62.171.163.76","161.97.150.49","161.97.73.1","161.97.102.87","89.58.32.232","38.242.206.59","89.58.35.113","46.173.134.119","46.173.134.248","185.249.225.76","194.163.134.132","74.142.7.120"]
     // const ips = ["72.83.12.82","65.108.145.211","46.173.134.100","65.21.4.149","89.58.33.130","95.111.255.98","31.7.195.202","82.65.226.81","31.7.195.208","31.7.195.201","31.7.195.205","31.7.195.204","31.7.195.203","75.119.149.118","173.249.26.69","86.121.167.250","5.161.71.168","162.227.122.111","89.58.35.222","38.242.207.96","89.58.13.117","178.18.247.121","194.163.168.94","75.119.158.11","75.119.141.47","151.197.19.215","202.61.242.89","66.94.101.100","45.32.134.22"]
-    const ips = ["70.54.165.23","209.126.84.231","144.126.144.226","63.250.52.93","216.128.178.2","82.64.37.19","86.86.93.95","202.61.200.111","31.7.195.206","194.163.144.234","192.99.15.164","207.180.208.93","207.180.210.133","38.242.215.101","176.126.47.134","31.7.195.105","31.7.195.210","31.7.195.217","31.7.195.115","31.7.195.213","31.7.195.116","31.7.195.215","31.7.195.207","31.7.195.104","31.7.195.108","31.7.195.101","31.7.195.214","31.7.195.224","194.163.166.101","89.58.15.139","31.7.195.211","31.7.195.119","31.7.195.209","31.7.195.102","31.7.195.111","31.7.195.121","35.76.39.237"]
+    const ips = ["70.54.165.23", "209.126.84.231", "144.126.144.226", "63.250.52.93", "216.128.178.2", "82.64.37.19", "86.86.93.95", "202.61.200.111", "31.7.195.206", "194.163.144.234", "192.99.15.164", "207.180.208.93", "207.180.210.133", "38.242.215.101", "176.126.47.134", "31.7.195.105", "31.7.195.210", "31.7.195.217", "31.7.195.115", "31.7.195.213", "31.7.195.116", "31.7.195.215", "31.7.195.207", "31.7.195.104", "31.7.195.108", "31.7.195.101", "31.7.195.214", "31.7.195.224", "194.163.166.101", "89.58.15.139", "31.7.195.211", "31.7.195.119", "31.7.195.209", "31.7.195.102", "31.7.195.111", "31.7.195.121", "35.76.39.237"]
     // const ips = ["185.237.252.248","185.216.177.15","135.125.183.102","194.163.187.112","202.61.207.40","202.61.200.118","92.240.66.189","217.160.61.162","74.142.7.118","209.59.164.74","66.94.124.217","31.7.194.139","104.225.216.235","209.145.55.34","65.21.172.62","194.163.161.62","157.90.221.138","65.21.172.59","89.58.31.30","75.119.157.98","202.61.200.22","173.249.27.225","161.97.108.17","45.88.188.189","202.61.207.236","95.111.226.196","202.61.198.182","207.180.251.217","45.157.178.244","194.163.168.94","161.97.156.19","202.61.203.177","62.171.162.208","31.7.194.140","193.38.33.172","5.189.163.60","194.163.163.209","207.180.246.79","144.91.115.203","75.119.129.69","66.94.106.66","45.32.221.244","185.217.127.183","88.198.23.105","65.108.10.70","194.163.161.184","185.239.209.11","62.171.166.59","75.119.158.87","207.180.206.150","202.61.207.139","75.119.156.74","178.18.248.135","161.97.134.154","5.189.157.9","75.119.155.63","161.97.134.122","89.58.27.34","89.58.29.123","173.249.34.234","194.163.183.208","5.189.134.65","202.61.236.63","62.171.184.240","46.173.134.175","95.111.243.242","194.163.188.65","65.21.132.14","194.163.162.211","71.126.67.86","95.111.234.79","74.80.195.11","23.227.173.36","209.126.81.235","65.21.60.91","194.163.186.191","194.163.163.213","185.225.233.26","194.163.154.92","161.97.171.229","144.91.98.69","202.61.229.41","144.91.83.157","75.119.132.117","185.217.127.136","167.86.118.24","202.61.201.103","164.68.112.202","144.91.93.125","161.97.76.82","144.91.122.6","82.65.226.81","155.138.165.92","162.212.152.110","95.111.255.151","209.126.82.211","207.180.232.62","144.126.155.210","75.119.151.120","66.94.118.177","193.188.15.214","107.152.32.76","207.244.234.248","107.152.43.102","195.88.87.83","161.97.154.69","141.94.76.95","185.193.67.1","75.119.146.233","75.119.158.36","161.97.140.235","202.61.238.184","173.249.51.7","62.171.134.194","207.180.233.97","62.171.145.74","185.245.182.172","95.111.232.102","161.97.124.102","75.119.157.80","89.58.30.180","173.249.25.119","46.173.134.156","75.119.157.162","64.227.42.55","95.111.236.211","75.119.149.163","161.97.183.19","66.94.107.113","162.212.153.207","209.145.49.181","209.126.87.6","202.61.200.250","202.61.250.53","194.163.143.18","178.18.240.255","89.58.14.52","89.58.24.31","136.244.103.2","62.171.190.167","207.180.249.214","95.111.241.72","202.61.202.55","202.61.205.148","62.171.189.166","207.180.227.8","45.129.182.59","161.97.165.7","2.59.156.139","161.97.97.102","206.189.30.223","202.61.206.120","202.61.194.173","77.68.76.222","185.185.82.111","5.161.51.248","66.119.15.221","68.72.138.169","209.145.49.182","209.182.236.55","66.94.114.234","173.212.254.79","95.111.248.17","194.163.166.133","194.163.139.141","75.119.130.23","164.68.97.226","62.171.146.21","161.97.104.139","62.171.166.58","144.91.66.23","173.249.14.123","202.61.202.159","161.97.145.122","144.91.108.196","144.91.73.208","95.111.248.120","109.205.181.255","89.58.14.17","164.68.98.41","95.111.235.179","2.59.156.180","202.61.200.111","144.91.66.78","109.90.207.31","144.126.137.171","154.53.33.214","194.233.72.242","194.233.83.186","38.105.209.123","62.171.185.208","5.189.160.150","45.32.124.179","65.21.132.12","95.216.124.196","95.216.124.200","136.243.226.51","89.58.27.240","89.58.15.31","194.163.129.118","45.136.29.135","157.90.146.169","185.217.126.37","207.180.237.118","207.180.241.244","161.97.90.182","136.243.226.58","202.61.201.56","207.180.226.231","185.202.238.152","88.99.20.2","207.180.227.41","194.163.183.182","95.179.142.63","202.61.242.230","207.180.244.236","185.188.250.71","144.126.133.42","23.227.173.185","144.202.111.71","207.180.205.49","65.21.81.151","178.18.241.199","89.58.9.108","65.21.222.98","194.163.148.252","144.91.78.255","207.180.249.81","178.18.252.165","144.91.70.164","202.61.202.243","82.64.37.19","161.97.88.170","62.171.189.160","144.91.111.134","194.163.139.218","161.97.147.148","202.61.204.17","62.171.159.189","207.180.237.90","193.38.34.89","161.97.74.58","161.97.161.22","202.61.194.87","167.86.96.135","100.4.72.94","162.212.153.219","5.161.49.152","72.194.134.226","209.145.63.55","95.216.80.121","95.216.124.213","95.216.80.102","95.216.124.198","136.244.108.25","194.163.170.187","194.163.146.238","161.97.153.110","75.119.155.66","161.97.87.56","207.180.248.154","164.68.121.49","75.119.158.11","194.163.163.211","161.97.99.231","75.119.158.46","95.111.232.85","173.249.22.199","207.180.225.30","95.111.236.187","144.91.102.165","92.240.66.187","185.193.67.0","144.91.67.173","76.67.213.49","194.233.72.243","207.148.80.85","144.91.122.89","144.91.76.192","63.250.52.246","146.255.194.228","194.163.182.156","194.163.186.209","185.239.209.230","194.163.190.131","194.163.139.153","89.58.3.226","178.18.251.166","209.250.249.228","194.163.163.212","144.91.86.88","161.97.130.106","93.104.215.187","194.163.190.134","164.68.120.91","62.171.146.12","62.171.144.23","194.163.163.171","95.111.245.117","92.240.66.181","46.173.134.135","161.97.154.71","95.111.228.182","95.111.252.95","173.249.13.229","62.171.151.48","208.87.134.22","134.122.38.171","207.244.251.100","194.36.144.191","116.203.149.106","89.58.26.142","89.58.30.132","89.58.12.71","161.97.128.215","161.97.134.81","164.68.106.123","161.97.141.28","173.212.202.225","95.111.251.112","139.59.180.184","207.180.232.167","207.180.242.116","194.163.163.208","164.68.127.228","207.180.242.64","164.68.122.129","173.249.52.26","161.97.102.205","207.180.215.211","207.180.223.23","93.104.215.209","161.97.70.94","194.163.163.210","62.171.129.78","75.119.129.134","144.91.101.252","143.110.223.38","193.188.15.239","66.94.118.118","89.58.26.67","89.58.25.155","51.38.125.46","45.132.246.245","89.58.24.59","89.58.30.61","62.171.155.171","202.61.201.21","75.119.148.41","89.58.25.104","193.26.159.135","202.61.238.18","89.58.26.145","161.97.82.112","5.189.140.48","161.35.54.51","89.58.10.47","107.152.44.112","108.58.190.254","82.37.1.113","66.94.101.100","173.249.16.195","207.244.246.142","178.18.253.164","202.61.202.224","62.171.173.208","89.58.15.139","75.119.130.25","95.216.124.210","95.216.124.206","194.163.183.149","95.216.124.205","167.86.77.149","194.36.146.66","144.91.117.51","5.189.167.16","158.58.129.4","209.145.53.161","194.163.170.93","67.227.227.154","5.189.151.215"]
     const totalNodes = ips.length;
     console.log(totalNodes);
@@ -702,7 +750,7 @@ async function massAppRestart(app) {
   setTimeout(async () => {
     // const ips = Object.keys(logins)
     // const ips = await getIPaddresses();
-    const ips = ["193.26.159.101","75.119.132.117","167.86.122.63","207.244.251.164","75.119.159.136","202.61.237.47","66.119.15.221","104.225.216.235","202.61.206.120","149.255.39.17","45.9.62.3","194.13.80.131","178.18.249.115","62.171.155.171","194.163.168.91","202.61.207.146","202.61.201.76","202.61.202.55","65.21.222.99","202.61.201.21","178.18.252.165","194.163.129.118","109.205.182.166","202.61.250.53","135.181.125.49","209.145.55.52","65.21.222.105","202.61.236.12","202.61.201.56","194.163.129.242","202.61.201.52","202.61.200.217","109.205.181.254","209.145.49.182","75.119.142.75","109.205.181.255","66.94.107.113","202.61.236.30","194.163.170.222","202.61.200.250","202.61.205.168","202.61.237.11","167.86.82.117","86.122.62.213","109.205.181.253","202.61.207.240","209.145.56.10","23.227.173.36","207.180.249.214","209.145.49.181","208.87.134.22","202.61.200.125","157.90.221.137","62.171.188.152","95.111.236.187","149.255.39.23","202.61.194.173","93.104.215.209","161.97.131.151","167.86.97.60","104.225.218.185","104.225.223.221","178.18.251.166","202.61.238.184","149.255.39.59","172.93.54.129","46.173.134.100","202.61.201.103","144.91.88.130","194.163.166.101","167.86.73.161","202.61.205.103","65.21.132.11","95.111.253.56","202.61.204.93","202.61.238.139","5.189.163.60","161.97.169.212","45.142.176.146","173.249.60.183","194.163.190.134","194.60.87.8","161.97.134.154","161.97.131.153","66.119.15.222","202.61.202.126","173.249.51.7","23.227.173.185","209.182.236.46","161.97.131.154","161.97.99.231","144.91.101.252","161.97.134.122","45.129.181.23","89.233.107.235","75.119.145.183","91.235.197.251","202.61.202.21","207.244.249.214","75.119.135.51","208.87.135.123","207.244.237.151","194.163.162.211","202.61.202.238","185.237.252.248","194.163.168.94","62.171.163.76","85.23.190.192","85.23.154.147","62.171.184.53","194.163.139.218","194.163.139.192","161.97.145.233","23.88.19.178","193.188.15.236","194.233.90.89","89.58.9.17","161.97.134.81","89.58.10.219","194.163.168.93","95.216.80.125","95.216.80.124","161.97.76.82","95.216.124.215","95.216.124.214","95.216.124.219","209.182.233.16","202.61.242.230","95.216.80.118","89.58.1.245","45.83.104.44","89.58.3.226","88.99.20.8","65.21.222.102","65.21.81.152","88.99.20.3","65.21.165.10","88.99.20.9","65.21.81.154","65.21.222.98","65.21.165.3","95.216.124.210","88.99.20.11","95.216.124.216","65.21.81.146","194.163.170.162","89.58.12.65","89.58.14.17","95.216.80.119","88.99.20.4","88.99.20.2","76.67.213.49","89.58.15.31","89.58.14.206","95.216.124.218","95.216.80.122","194.163.130.160","95.216.124.212","89.58.13.42","89.58.8.80","89.58.12.39","89.58.12.71","89.58.13.74","95.216.124.202","95.216.124.201","46.173.134.223","46.173.134.191","46.173.134.162","46.173.134.175","46.173.134.135","46.173.134.235","46.173.134.109","46.173.134.139","65.21.222.107","95.216.124.205","95.216.124.206","79.143.178.170","95.216.80.120","104.225.219.5","63.250.55.88","86.121.167.221","104.225.220.4","95.216.124.198","65.21.132.12","46.173.134.119","95.216.124.221","95.216.124.213","161.97.129.6","209.182.233.134","172.93.50.129","95.216.124.203","95.216.124.211","95.216.80.101","95.216.124.194","109.90.125.189","188.115.184.212","164.68.119.151","89.58.15.139","207.180.208.93","207.180.210.133","194.36.144.191","207.180.237.118","89.58.26.230","185.188.250.77","89.58.13.15","158.58.130.68","75.119.134.102","202.61.237.24","144.126.133.42","95.216.124.220","45.32.134.22","88.198.23.116","88.198.23.119","194.163.163.171","88.198.23.105","138.201.81.45","95.216.80.98","95.216.80.99","95.216.80.100","95.216.80.103","95.216.80.104","95.216.124.195","95.216.124.199","95.216.124.200","95.216.124.196","207.180.233.97","185.225.232.141","65.21.165.9","207.244.229.36","89.58.24.91","95.216.124.207","95.216.80.102","89.166.59.157","95.111.232.102","88.99.20.6","88.99.20.5","202.61.204.17","144.91.120.175","161.97.163.117","31.7.194.133","31.7.194.134","31.7.194.135","5.189.179.194","89.58.25.28","130.185.119.118","144.126.155.17","65.21.165.11","65.21.81.155","95.216.80.123","65.21.165.2","95.216.124.217","65.21.81.149","65.21.81.151","65.21.81.150","65.21.222.100","65.21.81.153","65.21.222.104","65.21.165.5","65.21.81.147","65.21.222.103","65.21.222.106","65.21.165.4","65.21.165.8","45.76.188.208","65.21.81.148","65.21.222.101","65.21.165.6","88.99.20.7","65.21.165.7","144.91.64.97","89.58.15.4","95.216.124.204","158.58.129.4","167.86.95.178","89.58.25.205","89.58.24.249","46.173.134.156","172.93.51.145","202.61.229.41","45.129.180.23","31.7.194.136","95.216.80.121","89.58.24.31","185.239.208.44","109.90.207.31","65.108.40.221","161.97.147.148","194.163.176.166","146.255.194.226","146.255.194.227","146.255.194.228","146.255.194.229","146.255.194.230","104.56.107.168","50.210.168.50","94.130.117.177","75.119.131.99","161.97.74.58","63.250.53.22","89.58.25.104","89.58.26.53","82.78.98.85","99.98.217.243","89.58.25.225","65.21.172.61","45.9.61.125","88.99.75.9","194.163.161.184","185.237.252.247","91.192.45.220","104.225.218.5","46.173.134.248","88.198.84.161","136.243.226.51","136.243.226.53","136.243.226.54","136.243.226.50","136.243.226.52","136.243.226.56","136.243.226.57","136.243.226.58","136.243.226.55","136.243.226.59","65.21.172.62","31.7.194.139","45.88.188.189","65.21.172.59","208.87.135.14","208.87.135.148","207.180.251.106","75.119.138.45","207.180.241.244","209.145.55.34","173.249.16.195","108.58.190.250","144.76.253.209","94.16.107.84","104.225.216.246","217.79.255.186","193.188.15.193","65.21.132.13","31.7.194.137","31.7.194.140","207.180.242.238","65.21.132.14","31.7.194.138","158.58.129.39"]
+    const ips = ["193.26.159.101", "75.119.132.117", "167.86.122.63", "207.244.251.164", "75.119.159.136", "202.61.237.47", "66.119.15.221", "104.225.216.235", "202.61.206.120", "149.255.39.17", "45.9.62.3", "194.13.80.131", "178.18.249.115", "62.171.155.171", "194.163.168.91", "202.61.207.146", "202.61.201.76", "202.61.202.55", "65.21.222.99", "202.61.201.21", "178.18.252.165", "194.163.129.118", "109.205.182.166", "202.61.250.53", "135.181.125.49", "209.145.55.52", "65.21.222.105", "202.61.236.12", "202.61.201.56", "194.163.129.242", "202.61.201.52", "202.61.200.217", "109.205.181.254", "209.145.49.182", "75.119.142.75", "109.205.181.255", "66.94.107.113", "202.61.236.30", "194.163.170.222", "202.61.200.250", "202.61.205.168", "202.61.237.11", "167.86.82.117", "86.122.62.213", "109.205.181.253", "202.61.207.240", "209.145.56.10", "23.227.173.36", "207.180.249.214", "209.145.49.181", "208.87.134.22", "202.61.200.125", "157.90.221.137", "62.171.188.152", "95.111.236.187", "149.255.39.23", "202.61.194.173", "93.104.215.209", "161.97.131.151", "167.86.97.60", "104.225.218.185", "104.225.223.221", "178.18.251.166", "202.61.238.184", "149.255.39.59", "172.93.54.129", "46.173.134.100", "202.61.201.103", "144.91.88.130", "194.163.166.101", "167.86.73.161", "202.61.205.103", "65.21.132.11", "95.111.253.56", "202.61.204.93", "202.61.238.139", "5.189.163.60", "161.97.169.212", "45.142.176.146", "173.249.60.183", "194.163.190.134", "194.60.87.8", "161.97.134.154", "161.97.131.153", "66.119.15.222", "202.61.202.126", "173.249.51.7", "23.227.173.185", "209.182.236.46", "161.97.131.154", "161.97.99.231", "144.91.101.252", "161.97.134.122", "45.129.181.23", "89.233.107.235", "75.119.145.183", "91.235.197.251", "202.61.202.21", "207.244.249.214", "75.119.135.51", "208.87.135.123", "207.244.237.151", "194.163.162.211", "202.61.202.238", "185.237.252.248", "194.163.168.94", "62.171.163.76", "85.23.190.192", "85.23.154.147", "62.171.184.53", "194.163.139.218", "194.163.139.192", "161.97.145.233", "23.88.19.178", "193.188.15.236", "194.233.90.89", "89.58.9.17", "161.97.134.81", "89.58.10.219", "194.163.168.93", "95.216.80.125", "95.216.80.124", "161.97.76.82", "95.216.124.215", "95.216.124.214", "95.216.124.219", "209.182.233.16", "202.61.242.230", "95.216.80.118", "89.58.1.245", "45.83.104.44", "89.58.3.226", "88.99.20.8", "65.21.222.102", "65.21.81.152", "88.99.20.3", "65.21.165.10", "88.99.20.9", "65.21.81.154", "65.21.222.98", "65.21.165.3", "95.216.124.210", "88.99.20.11", "95.216.124.216", "65.21.81.146", "194.163.170.162", "89.58.12.65", "89.58.14.17", "95.216.80.119", "88.99.20.4", "88.99.20.2", "76.67.213.49", "89.58.15.31", "89.58.14.206", "95.216.124.218", "95.216.80.122", "194.163.130.160", "95.216.124.212", "89.58.13.42", "89.58.8.80", "89.58.12.39", "89.58.12.71", "89.58.13.74", "95.216.124.202", "95.216.124.201", "46.173.134.223", "46.173.134.191", "46.173.134.162", "46.173.134.175", "46.173.134.135", "46.173.134.235", "46.173.134.109", "46.173.134.139", "65.21.222.107", "95.216.124.205", "95.216.124.206", "79.143.178.170", "95.216.80.120", "104.225.219.5", "63.250.55.88", "86.121.167.221", "104.225.220.4", "95.216.124.198", "65.21.132.12", "46.173.134.119", "95.216.124.221", "95.216.124.213", "161.97.129.6", "209.182.233.134", "172.93.50.129", "95.216.124.203", "95.216.124.211", "95.216.80.101", "95.216.124.194", "109.90.125.189", "188.115.184.212", "164.68.119.151", "89.58.15.139", "207.180.208.93", "207.180.210.133", "194.36.144.191", "207.180.237.118", "89.58.26.230", "185.188.250.77", "89.58.13.15", "158.58.130.68", "75.119.134.102", "202.61.237.24", "144.126.133.42", "95.216.124.220", "45.32.134.22", "88.198.23.116", "88.198.23.119", "194.163.163.171", "88.198.23.105", "138.201.81.45", "95.216.80.98", "95.216.80.99", "95.216.80.100", "95.216.80.103", "95.216.80.104", "95.216.124.195", "95.216.124.199", "95.216.124.200", "95.216.124.196", "207.180.233.97", "185.225.232.141", "65.21.165.9", "207.244.229.36", "89.58.24.91", "95.216.124.207", "95.216.80.102", "89.166.59.157", "95.111.232.102", "88.99.20.6", "88.99.20.5", "202.61.204.17", "144.91.120.175", "161.97.163.117", "31.7.194.133", "31.7.194.134", "31.7.194.135", "5.189.179.194", "89.58.25.28", "130.185.119.118", "144.126.155.17", "65.21.165.11", "65.21.81.155", "95.216.80.123", "65.21.165.2", "95.216.124.217", "65.21.81.149", "65.21.81.151", "65.21.81.150", "65.21.222.100", "65.21.81.153", "65.21.222.104", "65.21.165.5", "65.21.81.147", "65.21.222.103", "65.21.222.106", "65.21.165.4", "65.21.165.8", "45.76.188.208", "65.21.81.148", "65.21.222.101", "65.21.165.6", "88.99.20.7", "65.21.165.7", "144.91.64.97", "89.58.15.4", "95.216.124.204", "158.58.129.4", "167.86.95.178", "89.58.25.205", "89.58.24.249", "46.173.134.156", "172.93.51.145", "202.61.229.41", "45.129.180.23", "31.7.194.136", "95.216.80.121", "89.58.24.31", "185.239.208.44", "109.90.207.31", "65.108.40.221", "161.97.147.148", "194.163.176.166", "146.255.194.226", "146.255.194.227", "146.255.194.228", "146.255.194.229", "146.255.194.230", "104.56.107.168", "50.210.168.50", "94.130.117.177", "75.119.131.99", "161.97.74.58", "63.250.53.22", "89.58.25.104", "89.58.26.53", "82.78.98.85", "99.98.217.243", "89.58.25.225", "65.21.172.61", "45.9.61.125", "88.99.75.9", "194.163.161.184", "185.237.252.247", "91.192.45.220", "104.225.218.5", "46.173.134.248", "88.198.84.161", "136.243.226.51", "136.243.226.53", "136.243.226.54", "136.243.226.50", "136.243.226.52", "136.243.226.56", "136.243.226.57", "136.243.226.58", "136.243.226.55", "136.243.226.59", "65.21.172.62", "31.7.194.139", "45.88.188.189", "65.21.172.59", "208.87.135.14", "208.87.135.148", "207.180.251.106", "75.119.138.45", "207.180.241.244", "209.145.55.34", "173.249.16.195", "108.58.190.250", "144.76.253.209", "94.16.107.84", "104.225.216.246", "217.79.255.186", "193.188.15.193", "65.21.132.13", "31.7.194.137", "31.7.194.140", "207.180.242.238", "65.21.132.14", "31.7.194.138", "158.58.129.39"]
     const totalNodes = ips.length;
     console.log(totalNodes);
     for (const ip of ips) {
@@ -977,7 +1025,9 @@ async function getBalance(ip) {
   try {
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const updateResponse = await axiosGet(`http://${ip}:16127/daemon/getbalance`, {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const updateResponse = await axiosGet(`http://${adjIp}:${adjPort}/daemon/getbalance`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -1021,7 +1071,9 @@ async function startFolding(ip) {
   try {
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    await axiosGet(`http://${ip}:16127/apps/installtemporarylocalapp/foldingathome`, {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    await axiosGet(`http://${adjIp}:${adjPort}/apps/installtemporarylocalapp/foldingathome`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -1037,7 +1089,9 @@ async function removeFolding(ip) {
   try {
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const response = await axiosGet(`http://${ip}:16127/apps/appremove/PresearchNode1646065882374`, {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const response = await axiosGet(`http://${adjIp}:${adjPort}/apps/appremove/PresearchNode1646065882374`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -1055,7 +1109,9 @@ async function removeDibiFetch(ip) {
   try {
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const response = await axiosGet(`http://${ip}:16127/apps/redeploy/KadenaChainWebNode/true`, {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const response = await axiosGet(`http://${adjIp}:${adjPort}/apps/redeploy/KadenaChainWebNode/true`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -1106,7 +1162,9 @@ async function pauseKadena(ip) {
   try {
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const response = await axiosGet(`http://${ip}:16127/apps/appunpause/KadenaChainWebNode`, {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const response = await axiosGet(`http://${adjIp}:${adjPort}/apps/appunpause/KadenaChainWebNode`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -1144,7 +1202,9 @@ async function isMessageOrError(ip) {
     const axiosConfig = {
       timeout: 4567,
     };
-    const mesRes = await axiosGet(`http://${ip}:16127/apps/temporarymessages`, axiosConfig);
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const mesRes = await axiosGet(`http://${adjIp}:${adjPort}/apps/temporarymessages`, axiosConfig);
     if (mesRes.data.data.length === 1) {
       return true;
     } else {
@@ -1182,7 +1242,9 @@ async function stopBlocking(ip) {
     const axiosConfig = {
       timeout: 4567,
     };
-    await axiosGet(`http://${ip}:16127/explorer/stop`, axiosConfig);
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    await axiosGet(`http://${adjIp}:${adjPort}/explorer/stop`, axiosConfig);
     return true;
   } catch (error) {
     return false;
@@ -1224,7 +1286,9 @@ async function reindexExplorer(ip) {
       },
       timeout: 4567,
     };
-    const response = await axiosGet(`http://${ip}:16127/explorer/reindex/true`, axiosConfig);
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const response = await axiosGet(`http://${adjIp}:${adjPort}/explorer/reindex/true`, axiosConfig);
     // console.log(response);
     return response.data.data
   } catch (error) {
@@ -1237,7 +1301,9 @@ async function checkNewDatabase(ip) {
     const axiosConfig = {
       timeout: 4567,
     };
-    const response = await axiosGet(`http://${ip}:16127/explorer/utxo/t3c51GjrkUg7pUiS8bzNdTnW2hD25egWUih`, axiosConfig);
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const response = await axiosGet(`http://${adjIp}:${adjPort}/explorer/utxo/t3c51GjrkUg7pUiS8bzNdTnW2hD25egWUih`, axiosConfig);
     const data = response.data.data;
     console.log(data);
     if (data[0]) {
@@ -1364,7 +1430,9 @@ async function rebuildZelFront(ip) {
   try {
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const updateResponse = await axiosGet(`http://${ip}:16127/flux/rebuildhome`, {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const updateResponse = await axiosGet(`http://${adjIp}:${adjPort}/flux/rebuildhome`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -1385,7 +1453,9 @@ async function rebuildZelFront(ip) {
 
 async function containsDashboard(ip) {
   try {
-    const response = await axios.get(`http://${ip}:16126`);
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] ? +ip.split(':')[1] - 1 : 16126;
+    const response = await axios.get(`http://${ip}:${adjPort}`);
     if (response.data.includes('Flux, Your')) {
       return true;
     }
@@ -1416,7 +1486,9 @@ async function reconstructHashes(ip) {
   try {
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const updateResponse = await axiosGet(`http://${ip}:16127/apps/reconstructhashes`, {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const updateResponse = await axiosGet(`http://${adjIp}:${adjPort}/apps/reconstructhashes`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -1433,7 +1505,9 @@ async function removeApp(ip, appname) {
   try {
     authHeader = await getAuthHeader(ip);
     const zelidauthHeader = authHeader;
-    const response = await axiosGet(`http://${ip}:16127/apps/appremove/${appname}/true`, {
+    const adjIp = ip.split(':')[0];
+    const adjPort = ip.split(':')[1] || 16127;
+    const response = await axiosGet(`http://${adjIp}:${adjPort}/apps/appremove/${appname}/true`, {
       headers: {
         zelidauth: zelidauthHeader,
       },
@@ -1524,7 +1598,7 @@ const remove = [
 //   removeFolding(ip);
 // }, 2000)
 //massZelCashUpdate2();
-// getApplicationLocationsUninstall('PresearchNode1640061492280');
+// getApplicationLocationsUninstall('testapp2');
 // getKadenaLocations();
 // massAppRestart('KadenaChainWebData');
 // massPauseKadena()
